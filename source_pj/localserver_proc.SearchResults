@@ -1,0 +1,7 @@
+---- updateCartvuConfig Æ¥Åä (6 ÔÚ 2 ÎÄ¼ş ) ----
+Main.c:Function: int updateCartvuConfig()
+Main.c:#include "updateCartvuConfig.inc"
+Main.c:            ret = updateCartvuConfig();
+updateCartvuConfig.inc:  Function: int updateCartvuConfig()
+updateCartvuConfig.inc:int updateCartvuConfig() {
+updateCartvuConfig.inc:}  // end of updateCartvuConfig
