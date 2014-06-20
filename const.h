@@ -1,7 +1,7 @@
 
 
 
-#define  VERSION                      "V1.99"   
+#define  VERSION                      "V2.00"   
 
 
 #define  DYNAMIC_DATABASE             "/AdNode/database/LocalNode.db"         // 动态数据库文件名
