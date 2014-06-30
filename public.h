@@ -37,11 +37,14 @@ int getLocalIp(char *ip) {
 
   if (ioctl(inet_sock, SIOCGIFADDR, &ifr) < 0) {
     ip = NULL;
+    close(inet_sock);
     return -1;
   } else {
     device_data = (struct sockaddr_in*)&(ifr.ifr_addr);
     strcpy(ip, inet_ntoa(device_data->sin_addr));
   }  // end if
+
+  close(inet_sock);
   return 0 ;
 }  // end
 

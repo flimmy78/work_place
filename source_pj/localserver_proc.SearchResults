@@ -1,7 +1,1 @@
----- updateCartvuConfig 匹配 (6 在 2 文件 ) ----
-Main.c:Function: int updateCartvuConfig()
-Main.c:#include "updateCartvuConfig.inc"
-Main.c:            ret = updateCartvuConfig();
-updateCartvuConfig.inc:  Function: int updateCartvuConfig()
-updateCartvuConfig.inc:int updateCartvuConfig() {
-updateCartvuConfig.inc:}  // end of updateCartvuConfig
+---- get / 匹配 (0 在 0 文件 ) ----

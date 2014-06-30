@@ -127,6 +127,10 @@ and move the download software to thread
 94  2014-06-05    v1.97           add show media adstatus and create the info here     
 95  2014-06-05    v1.98           add re login when first download the command.sys  
 96  2014-06-19    v1.99           add get userdef.zip from different path
+                                  modify when hongkong server change has no alalm file
+97  2014-06-19    v1.99           modify cross socket receive error
+98  2014-06-30    v1.99           add Connection: close to post
+                                  modify checkLane when the the num is bigger than service node
 
 
 
@@ -476,7 +480,7 @@ int loginServer() {
 
 
     sprintf(request,
-            "POST /login.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:16\n\nmac=%s\n\n",
+            "POST /login.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:16\n\nmac=%s\n\n",
             serverDomain1, mac);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
@@ -487,6 +491,8 @@ int loginServer() {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -494,6 +500,8 @@ int loginServer() {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
 
     if (ret < 0) {
@@ -1106,6 +1114,8 @@ int get_ip(char * ipaddr)
         return -1;
     }
 
+    printf("\n\n~~~~~~~~~~%s~~sock fd = %d~~~~~~~~~~~\n\n", __func__, sock_get_ip);
+
     memset(&ifr_ip, 0, sizeof(ifr_ip));
 
     for(i = 0; i < ETH_SIZE; i++) {
@@ -1119,6 +1129,7 @@ int get_ip(char * ipaddr)
     }
     if (i == ETH_SIZE) {
         strncpy(ipaddr, "ioctl fail to get ip", IPADDR_SIZE);
+        close(sock_get_ip);
         return -1;
     }
 
@@ -1162,6 +1173,7 @@ void receive_fun(void) {
         return;
     }
 
+    printf("\n\n~~~~~~~~~~%s~~sock fd = %d~~~~~~~~~~~\n\n", __func__, socket_fd);
 
     // for receiver broadcast
     rec.sin_family = AF_INET;
@@ -1171,6 +1183,7 @@ void receive_fun(void) {
 
     if (bind(socket_fd, (struct sockaddr *)&rec, rec_len)) {
         perror("bind socket error");
+        close(socket_fd);
         return;
     }
 
@@ -1182,6 +1195,7 @@ void receive_fun(void) {
 
     if (setsockopt(socket_fd, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt)) == -1) {
         perror("set socket opt fail");
+        close(socket_fd);
         return;
     }
 
@@ -1226,6 +1240,7 @@ void send_cartvu_media_status(void) {
         printf("creat socket error");
         return ;  
     }
+    printf("\n\n~~~~~~~~~~%s~~sock fd = %d~~~~~~~~~~~\n\n", __func__, socket_fd);
 
     //int b_on = 1;
     //setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &b_on, sizeof(int));
@@ -1242,6 +1257,7 @@ void send_cartvu_media_status(void) {
     /*3°ó¶¨*/
     if(bind(socket_fd, (struct sockaddr *)&sin, sizeof(sin))) {
         perror("bind socket error");
+        close(socket_fd);
         return ;
     }
 
@@ -1282,6 +1298,8 @@ void send_cartvu_media_status(void) {
         deal_kind(send);
     }
 
+    close(socket_fd);
+        
 
 }
 

@@ -72,7 +72,7 @@ int downloadSoftware(int type) {
             break;
     }
     sprintf(request, 
-            "POST /software.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST /software.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             serverDomain1, strlen(para), para);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
@@ -81,6 +81,8 @@ int downloadSoftware(int type) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -88,7 +90,10 @@ int downloadSoftware(int type) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
     
     if (ret < 0) {
 	printf("the network maybe error\n");

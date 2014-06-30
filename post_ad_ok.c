@@ -74,7 +74,7 @@ int post_ad_num(int num, int flag) {
 
 
     sprintf(request,
-            "POST %s HTTP/1.1\r\nHOST:%s\r\nContent-Type:application/x-www-form-urlencoded\r\nContent-Length:%d\r\n\r\n%s\r\n\r\n",
+            "POST %s HTTP/1.1\r\nHOST:%s\r\nConnection: close\nContent-Type:application/x-www-form-urlencoded\r\nContent-Length:%d\r\n\r\n%s\r\n\r\n",
             POST_AD_PHP, serverDomain1, strlen(paras), paras);
     //printf("request     :%s\n\n", request);
 
@@ -85,6 +85,8 @@ int post_ad_num(int num, int flag) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -92,7 +94,10 @@ int post_ad_num(int num, int flag) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
 
     printf("start:\n%sstop\n", response);
 

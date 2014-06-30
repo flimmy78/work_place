@@ -21,7 +21,7 @@ int cartvuStatisCallback(void *para, int n_column, char **column_value, char **c
             mac,
             column_value[0], column_value[1], column_value[2], column_value[3], column_value[4]);
     sprintf(request,
-            "POST /statis.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST /statis.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             serverDomain1, strlen(paras), paras);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
@@ -30,6 +30,8 @@ int cartvuStatisCallback(void *para, int n_column, char **column_value, char **c
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -37,7 +39,10 @@ int cartvuStatisCallback(void *para, int n_column, char **column_value, char **c
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
     
     if (ret < 0) {
 	printf("the network maybe error\n");
@@ -106,19 +111,28 @@ int mediaStatisCallback(void *para, int n_column, char **column_value, char **co
     	    mac,
             column_value[0], column_value[1], column_value[2]);
     sprintf(request,
-            "POST /statis.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST /statis.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             serverDomain1, strlen(paras), paras);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
     bzero(temp_response, sizeof(temp_response));
     if (pthread_mutex_lock (&send_mutex) != 0) {
-        printf("mutex lock fail %s\n", __func__);
+        sprintf(temp_response, "mutex lock fail %s", __func__);
+        printf("%s\n", temp_response);
+        recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
     if (pthread_mutex_unlock(&send_mutex) != 0) {
-        printf("mutex unlock fail %s\n", __func__);
+        sprintf(temp_response, "mutex unlock fail %s", __func__);
+        printf("%s\n", temp_response);
+        recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
     
     if (ret < 0) {
 	printf("the network maybe error\n");

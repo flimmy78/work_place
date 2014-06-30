@@ -101,7 +101,7 @@ int sendStatus(int type) {
     }
 
     sprintf(request,
-            "POST /status.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST /status.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             serverDomain1, strlen(paras), paras);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
@@ -110,6 +110,8 @@ int sendStatus(int type) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -117,7 +119,10 @@ int sendStatus(int type) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
     if (ret < 0) {
         printf("the network maybe error\n");
 
@@ -131,7 +136,7 @@ int sendStatus(int type) {
         return -1;
     }
 
-    //  printf("response is %s\n", response);
+    //printf("response is %s\n", response);
     strcpy(buf_echo, response);
     p = strstr(response, "\r\n\r\n");
     if (p != NULL) {

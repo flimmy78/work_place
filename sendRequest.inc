@@ -17,7 +17,8 @@ int sendRequest(char *ip,                       // server's ip address  '
         char *response,                 // response you will get from the server
         unsigned int len) {             // length of response
     //ssize_t ret;
-    int     sockfd;
+    int     sockfd = -1;
+    static int last_sockfd = 0;
     struct  sockaddr_in  serverAddress;
     int flag;
     int flags;
@@ -38,17 +39,42 @@ int sendRequest(char *ip,                       // server's ip address  '
     time(&now_time);
     start_time = now_time;
 
-    // create a socket
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        perror("socket");
-        strcpy(response, "socket create error");
-#if USE_MUX
-        pthread_mutex_unlock (&post_request);
-#endif
-        return -1;
-    }  // end of if
-    //printf("sockfd is %d\n", sockfd);
+
+    printf("\n\n!!!!!!!!!!!!!!!!last_sockfd is %d~~~~~~~~~~~~~~~~~~~~~\n\n", last_sockfd);
     // connect to socket
+
+
+    while(1){
+            // create a socket
+        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket");
+            strcpy(response, "socket create error");
+#if USE_MUX
+            pthread_mutex_unlock (&post_request);
+#endif
+            return -1;
+        }  // end of if
+        
+        if (last_sockfd == sockfd) {
+            //sleep(1);
+            //usleep(1000);
+            printf("equal please wait here now sock_fd = %d  last fd = %d\n", sockfd, last_sockfd);
+            // not close now fd
+        } else {
+            printf("no equal now sock_fd = %d  last fd = %d\n", sockfd, last_sockfd);
+            if (close(last_sockfd) != 0) {
+                printf("close sockfd error %d\n", last_sockfd);
+            } else {
+            
+                printf("close last sockfd ok here %d\n", last_sockfd);
+            }
+            break;
+        }
+
+           
+    }
+    
+     last_sockfd = sockfd;
 
 
     // non block connect here

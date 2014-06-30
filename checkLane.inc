@@ -46,7 +46,7 @@ int checkLane() {
 
     sprintf(paras, "mac=%s&ln=%d", mac, i + 1);
     sprintf(request,
-            "POST /checklane.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST /checklane.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             serverDomain1, strlen(paras), paras);
     //printf("request=%s\n", request);
     bzero(response, sizeof(response));
@@ -55,6 +55,8 @@ int checkLane() {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -62,7 +64,10 @@ int checkLane() {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
     if (ret < 0) {
     	isLogin = 0;
     	printf("network maybe error\n");
@@ -185,8 +190,29 @@ int checkLane() {
 	recordLog(1, 34, buf_echo);
       }
     }  // end of for
-    if (isChecked == 2) break;
+    if (isChecked == 2) {
+        printf("service node has no cartvu media in %d\n", i + 1);
+        
+        sprintf(sqlStr, "delete from Mac where Lane>=%d",i + 1);
+        ret = sqlite3_exec(conn, sqlStr, NULL, NULL, NULL);  
+        if (ret != SQLITE_OK) {
+            printf("fail to %s\n", sqlStr);
+            recordLog(1, 34, strcat(sqlStr, "Execute (checkLane()) fail!!"));
+        
+        } else {
+              printf("execute %s ok\n", sqlStr);
+              recordLog(1, 2, strcat(sqlStr, " execute ok"));
+        }
+
+        
+        break;
+    }
   }  // end of for
+
+
+
+
+  
   sqlite3_close(conn);                                                               // ¹Ø±ÕÊý¾Ý¿â
   return 0;  
 

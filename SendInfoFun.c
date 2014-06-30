@@ -158,7 +158,7 @@ int query_info(struct receive_info  *rec_info) {
 
     sprintf(paras, "%s%s=%s", paras, "request", "query");
     sprintf(request,
-            "POST %s HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST %s HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             SEND_INFO_PHP, serverDomain1, strlen(paras), paras);
     printf("request     :%s\n\n", paras);
 
@@ -170,6 +170,8 @@ int query_info(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -177,7 +179,10 @@ int query_info(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
 
 
     if (ret < 0) {
@@ -277,7 +282,7 @@ int request_ok(struct receive_info  *rec_info) {
 
     sprintf(paras, "%s%s=%s&cashier=%s", paras, "request", "received", rec_info->cashier);
     sprintf(request,
-            "POST %s HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST %s HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             SEND_INFO_PHP, serverDomain1, strlen(paras), paras);
     printf("request     :%s\n\n", paras);
 
@@ -288,6 +293,8 @@ int request_ok(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -295,7 +302,10 @@ int request_ok(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
 
 
     if (ret < 0) {
@@ -438,7 +448,7 @@ int confirmed_ok(struct receive_info  *rec_info) {
 
     sprintf(paras, "%s%s=%s&cashier=%s", paras, "request", "confirmed", rec_info->cashier);
     sprintf(request,
-            "POST %s HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST %s HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             SEND_INFO_PHP, serverDomain1, strlen(paras), paras);
     printf("request     :%s\n\n", paras);
 
@@ -450,6 +460,8 @@ int confirmed_ok(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -457,7 +469,10 @@ int confirmed_ok(struct receive_info  *rec_info) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
 
 
     if (ret < 0) {
@@ -526,7 +541,7 @@ int test_send(int cashier) {
 
     sprintf(paras, "%s%s", paras, "lane=09&imagefile=I-11-20140320163815.jpg&alarmtime=20140317183255&confirm=0&cashier=1111&barcode=aaa");
     sprintf(request,
-            "POST %s HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+            "POST %s HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
             "/alarm.php", serverDomain1, strlen(paras), paras);
     printf("request     :%s\n\n", paras);
 
@@ -538,6 +553,8 @@ int test_send(int cashier) {
         sprintf(temp_response, "mutex lock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("lock in %s \n", __func__);
     }
     ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
     strcpy(response, temp_response);
@@ -545,7 +562,10 @@ int test_send(int cashier) {
         sprintf(temp_response, "mutex unlock fail %s", __func__);
         printf("%s\n", temp_response);
         recordLog(1, 2, temp_response);
+    } else {
+        printf("unlock in %s\n", __func__);
     }
+
 
 
     if (ret < 0) {

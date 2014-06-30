@@ -171,23 +171,28 @@ int sendAlarmImages() {
 	                    now_tmp->alert_image.confirmed, now_tmp->alert_image.cashier, now_tmp->alert_image.barcode);
 	            bzero(request, sizeof(request));
 	            sprintf(request,
-	                    "POST /alarm.php HTTP/1.1\nHOST:%s\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
+	                    "POST /alarm.php HTTP/1.1\nHOST:%s\nConnection: close\nContent-Type:application/x-www-form-urlencoded\nContent-Length:%d\n\n%s\n\n",
 	                    serverDomain1, strlen(paras), paras);
 	            bzero(response, sizeof(response));
 		    bzero(temp_response, sizeof(temp_response));
 	            
-		    if (pthread_mutex_lock (&send_mutex) != 0) {
-		        sprintf(temp_response, "mutex lock fail %s", __func__);
-		        printf("%s\n", temp_response);
-		        recordLog(1, 2, temp_response);
-		    }
-		    ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
-		    strcpy(response, temp_response);
-		    if (pthread_mutex_unlock(&send_mutex) != 0) {
-		        sprintf(temp_response, "mutex unlock fail %s", __func__);
-		        printf("%s\n", temp_response);
-		        recordLog(1, 2, temp_response);
-		    }
+                if (pthread_mutex_lock (&send_mutex) != 0) {
+                    sprintf(temp_response, "mutex lock fail %s", __func__);
+                    printf("%s\n", temp_response);
+                    recordLog(1, 2, temp_response);
+                } else {
+                    printf("lock in %s \n", __func__);
+                }
+                ret = sendRequest(ip, request, temp_response, sizeof(temp_response));
+                strcpy(response, temp_response);
+                if (pthread_mutex_unlock(&send_mutex) != 0) {
+                    sprintf(temp_response, "mutex unlock fail %s", __func__);
+                    printf("%s\n", temp_response);
+                    recordLog(1, 2, temp_response);
+                } else {
+                    printf("unlock in %s\n", __func__);
+                }
+
 
 	            
 	            if (ret < 0) {
@@ -232,7 +237,17 @@ int sendAlarmImages() {
 				                }
 				            } else {
 						 recordLog(1, 12,"the result is error!!!(sendAlarmImages())");
-						 recordLog(1, 12,strcat(buf_echo, " the result is error!!!(sendAlarmImages())"));
+						 sprintf(temp_response, "%s the result is error!!!(sendAlarmImages()) ~%s~", buf_echo, paras);
+						 printf("%s\n", temp_response);
+						 recordLog(1, 12,temp_response);
+
+						// in order to avoid chang hong kong server error
+						now_tmp->alert_image.flag = 0;
+				                ret = write_into_sqlite(now_tmp->alert_image);
+				                if (ret < 0) {
+				                    printf("write to sqlite flag = 0 fail\n");
+
+				                }
 				            }
 			            }
 		            }
